@@ -1,0 +1,51 @@
+# Frappe CRM + ERPNext v15 cho Điện Máy Xanh (đồ án CRM – UIT)
+# Khởi chạy:   docker compose up -d        (lần đầu ~15–30 phút để tải mã nguồn & khôi phục dữ liệu)
+# Theo dõi:    docker compose logs -f frappe
+# Truy cập:    http://dmx.localhost:8000   (hoặc http://localhost:8000)
+name: crm-dmx
+
+services:
+  mariadb:
+    image: mariadb:10.11
+    restart: unless-stopped
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --skip-character-set-client-handshake
+      - --skip-innodb-read-only-compressed
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+
+  frappe:
+    image: frappe/bench:latest
+    restart: unless-stopped
+    command: bash /workspace/docker/init.sh
+    env_file: .env
+    environment:
+      - SHELL=/bin/bash
+    working_dir: /home/frappe
+    volumes:
+      - .:/workspace
+    ports:
+      - "${HTTP_PORT:-8000}:8000"
+      - "9000:9000"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+volumes:
+  mariadb-data:

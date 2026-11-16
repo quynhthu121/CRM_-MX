@@ -1,0 +1,9 @@
+{
+ "db_host": "127.0.0.1",
+ "db_name": "_0378ee0793e4d8a3",
+ "db_password": "WariH0bCo9W9oFpO",
+ "db_type": "mariadb",
+ "encryption_key": "GpUJDp6s-FIj3fhsJIGeqsx-pkSqg7m7ghZ3MEDcC-M=",
+ "mute_emails": 1,
+ "server_script_enabled": 1
+}

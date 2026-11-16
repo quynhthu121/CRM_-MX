@@ -1,0 +1,21 @@
+# Docker / bench tạm thời (bench nằm trong container, không đẩy lên Git)
+frappe-bench/
+sites/
+logs/
+*.log
+# Python / Node
+__pycache__/
+*.pyc
+.venv/
+node_modules/
+# Hệ điều hành / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+~$*.docx
+docs/screenshots/_tmp.png
+
+# Báo cáo chỉ lưu trên máy, không đưa lên GitHub
+docs/Bao_cao_*.docx
+docs/Bao_cao_*.md

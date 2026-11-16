@@ -1,0 +1,101 @@
+{%- set company = frappe.get_doc("Company", doc.company) -%}
+{%- set phone = frappe.db.get_value("Customer", doc.customer, "mobile_no") -%}
+<style>
+  .dmx { font-family: "Segoe UI", Roboto, Arial, sans-serif; color: #1f2937; font-size: 12px; }
+  .dmx-head { display: flex; align-items: center; justify-content: space-between;
+              border-bottom: 4px solid #0066b3; padding-bottom: 10px; margin-bottom: 14px; }
+  .dmx-brand { display: flex; align-items: center; gap: 12px; }
+  .dmx-brand img { width: 74px; height: 74px; }
+  .dmx-brand h1 { color: #0066b3; font-size: 22px; margin: 0; font-weight: 800; letter-spacing: .3px; }
+  .dmx-brand p { margin: 2px 0 0; color: #4b5563; font-size: 11px; }
+  .dmx-title { text-align: right; }
+  .dmx-title h2 { margin: 0; color: #fff; background: #0066b3; padding: 6px 16px; border-radius: 4px;
+                  font-size: 18px; letter-spacing: 1px; }
+  .dmx-title div { margin-top: 6px; font-size: 11px; color: #374151; }
+  .dmx-info { display: flex; gap: 16px; margin-bottom: 14px; }
+  .dmx-box { flex: 1; border: 1px solid #cfe3f3; border-radius: 6px; padding: 8px 12px; background: #f5faff; }
+  .dmx-box b.lbl { color: #0066b3; display: block; margin-bottom: 4px; text-transform: uppercase; font-size: 10.5px; }
+  table.dmx-items { width: 100%; border-collapse: collapse; }
+  table.dmx-items th { background: #0066b3; color: #fff; padding: 7px 6px; font-weight: 600; font-size: 11.5px; }
+  table.dmx-items td { border-bottom: 1px solid #e5e7eb; padding: 7px 6px; font-size: 12px !important; }
+  table.dmx-items td.code { white-space: nowrap; font-family: monospace; font-size: 11px !important; }
+  table.dmx-items tr:nth-child(even) td { background: #f8fbfe; }
+  .r { text-align: right; } .c { text-align: center; }
+  .dmx-total { margin-top: 10px; display: flex; justify-content: flex-end; }
+  .dmx-total table td { padding: 4px 10px; }
+  .dmx-total .grand td { background: #ffd400; font-weight: 800; font-size: 14px; color: #0b3d6b; }
+  .dmx-terms { margin-top: 14px; font-size: 11px; border-left: 4px solid #ffd400; padding: 6px 10px; background: #fffbe6; }
+  .dmx-sign { display: flex; justify-content: space-between; margin-top: 26px; text-align: center; }
+  .dmx-sign div { width: 45%; } .dmx-sign i { color: #6b7280; font-size: 10.5px; }
+  .dmx-foot { margin-top: 40px; text-align: center; background: #0066b3; color: #fff; padding: 9px; border-radius: 4px; }
+  .dmx-foot b { color: #ffd400; }
+</style>
+<div class="dmx">
+  <div class="dmx-head">
+    <div class="dmx-brand">
+      {% if company.company_logo %}<img src="{{ company.company_logo }}">{% endif %}
+      <div>
+        <h1>ĐIỆN MÁY XANH</h1>
+        <p><b>Công ty Cổ phần Thế Giới Di Động</b> – Hệ thống Điện Máy Xanh</p>
+        <p>128 Trần Quang Khải, P. Tân Định, TP. Hồ Chí Minh · Tổng đài 1800.1061 · dienmayxanh.com</p>
+      </div>
+    </div>
+    <div class="dmx-title">
+      <h2>HÓA ĐƠN BÁN HÀNG</h2>
+      <div>Số: <b>{{ doc.name }}</b></div>
+      <div>Ngày: {{ frappe.utils.formatdate(doc.posting_date, "dd/MM/yyyy") }}</div>
+      {% if doc.due_date %}<div>Hạn thanh toán: {{ frappe.utils.formatdate(doc.due_date, "dd/MM/yyyy") }}</div>{% endif %}
+    </div>
+  </div>
+
+  <div class="dmx-info">
+    <div class="dmx-box">
+      <b class="lbl">Khách hàng</b>
+      <div><b>{{ doc.customer_name }}</b></div>
+      {% if phone %}<div>Điện thoại: {{ phone }}</div>{% endif %}
+      {% if doc.contact_email %}<div>Email: {{ doc.contact_email }}</div>{% endif %}
+      {% if doc.address_display %}<div>{{ doc.address_display }}</div>{% endif %}
+    </div>
+    <div class="dmx-box">
+      <b class="lbl">Nhân viên bán hàng</b>
+      <div>{{ frappe.db.get_value("User", doc.owner, "full_name") }}</div>
+      <div>Email: {{ doc.owner }}</div>
+      <div>Hình thức: Giao hàng & lắp đặt tận nhà</div>
+    </div>
+  </div>
+
+  <table class="dmx-items">
+    <thead><tr>
+      <th class="c" style="width:5%">STT</th><th style="width:16%">Mã SP</th><th>Tên sản phẩm / dịch vụ</th>
+      <th class="c" style="width:7%">SL</th><th class="r" style="width:16%">Đơn giá (₫)</th><th class="r" style="width:17%">Thành tiền (₫)</th>
+    </tr></thead>
+    <tbody>
+    {% for row in doc.items %}
+      <tr>
+        <td class="c">{{ row.idx }}</td><td class="code">{{ row.item_code }}</td><td>{{ row.item_name }}</td>
+        <td class="c">{{ row.get_formatted("qty") }}</td>
+        <td class="r">{{ "{:,.0f}".format(row.rate).replace(",", ".") }}</td>
+        <td class="r">{{ "{:,.0f}".format(row.amount).replace(",", ".") }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="dmx-total"><table>
+    <tr><td>Tạm tính</td><td class="r">{{ "{:,.0f}".format(doc.total).replace(",", ".") }} ₫</td></tr>
+    {% if doc.discount_amount %}<tr><td>Khuyến mãi</td><td class="r">-{{ "{:,.0f}".format(doc.discount_amount).replace(",", ".") }} ₫</td></tr>{% endif %}
+    <tr class="grand"><td>TỔNG THANH TOÁN</td><td class="r">{{ "{:,.0f}".format(doc.grand_total).replace(",", ".") }} ₫</td></tr>
+  </table></div>
+
+  {% if doc.terms %}<div class="dmx-terms"><b>Điều khoản:</b> {{ doc.terms }}</div>{% endif %}
+
+  <div class="dmx-sign">
+    <div><b>Khách hàng</b><br><i>(Ký, ghi rõ họ tên)</i></div>
+    <div><b>Đại diện Điện Máy Xanh</b><br><i>(Ký, ghi rõ họ tên)</i></div>
+  </div>
+
+  <div class="dmx-foot">
+    <b>Cảm ơn Quý khách đã tin tưởng và mua sắm tại Điện Máy Xanh!</b><br>
+    Mọi thắc mắc vui lòng liên hệ Tổng đài miễn phí 1800.1061 (7:30 – 22:00) · www.dienmayxanh.com
+  </div>
+</div>
