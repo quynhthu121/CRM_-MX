@@ -12,6 +12,17 @@ export REPO_DIR=/workspace
 
 log() { echo -e "\n========== [DMX] $* ==========\n"; }
 
+# MariaDB client trong image frappe/bench mặc định đòi SSL, còn server mariadb:10.11
+# trong compose không bật TLS -> "ERROR 2026: SSL is required, but the server does not
+# support it" khi `bench restore`. Tắt SSL cho client (chỉ dùng trong mạng nội bộ Docker).
+cat > /home/frappe/.my.cnf <<'EOF'
+[client]
+skip-ssl
+
+[mysqldump]
+skip-ssl
+EOF
+
 # ---------------------------------------------------------------- Lần chạy sau: chỉ start
 if [ -f "$BENCH/sites/$SITE/site_config.json" ] && [ -f "$BENCH/.dmx_ready" ]; then
   log "Bench đã sẵn sàng – khởi động server (http://$SITE:8000)"
